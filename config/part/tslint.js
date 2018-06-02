@@ -1,10 +1,15 @@
-module.exports = () => ({
+module.exports = () =>({
     module: {
-        preLoaders: [
+        rules: [
             {
-                test: /\.tsx?$/,
-                loader: 'tslint-loader',
-                options: {}
+                test: /\.tsx$/,
+                enforce: 'pre',
+                use: [
+                    {
+                        loader: 'tslint-loader',
+                        options: { /* Loader options go here */ }
+                    }
+                ]
             }
         ]
     }

@@ -7,14 +7,12 @@
         "target": "es6",
         "jsx": "react"
     },
-    "include": [
-        "./src/**/*"
-    ],
+    "include": ["./app/**/*"],
     "awesomeTypescriptLoaderOptions": {
         "babelCore": "@babel/core",
         "useBabel": true,
         "useCache": true,
         "forceIsolatedModules": true,
-        "reportFiles": ["src/**/*.{ts,tsx}"]
+        "reportFiles": ["app/**/*.{ts,tsx}"]
     }
 }

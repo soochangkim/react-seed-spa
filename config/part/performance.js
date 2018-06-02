@@ -1,6 +1,6 @@
-exports.reactPerformanceTool = () => ({
+module.exports = () => ({
     module: {
-        loaders: [
+        rules: [
             {
                 test: require.resolve('react'),
                 loader: 'expose?React'
