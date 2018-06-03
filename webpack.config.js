@@ -6,13 +6,10 @@ const TARGET = process.env.npm_lifecycle_event;
 const ENABLE_POLLING = process.env.ENABLE_POLLING;
 const PATHS = {
     app: path.join(__dirname, 'app'),
-    // style: [],
     dist: path.join(__dirname, 'dist'),
     test: path.join(__dirname, 'tests')
 };
-
-process.env.BABEL_ENV = TARGET;
-
+// process.env.BABEL_ENV = TARGET;
 const common = merge(
     {
         entry: {
@@ -20,15 +17,31 @@ const common = merge(
         },
         output: {
             path: PATHS.dist,
-            filename: '[name].js'
+            filename: '[name].js',
             // TODO: Set publicPath to match your GitHub project name
             // E.g., '/kanban-demo/'. Webpack will alter asset paths
             // based on this. You can even use an absolute path here
             // or even point to a CDN.
-            //publicPath: ''
+            //publicPath: '',
+            chunkFilename: '[name].js',
+            filename: '[name].js'
         },
         resolve: {
             extensions: ['.ts', '.tsx', '.js', '.jsx']
+        },
+        optimization: {
+            splitChunks: {
+                cacheGroups: {
+                    commons: {
+                        test: /[\\/]node_modules[\\/]/,
+                        name: 'vendor',
+                        chunks: 'initial'
+                    }
+                }
+            },
+            runtimeChunk: {
+                name: 'manifest'
+            }
         }
     },
     parts.template({
@@ -36,35 +49,32 @@ const common = merge(
         appMountId: 'app'
     }),
     parts.script(),
-    parts.tslint()
+    parts.tslint(),
+    parts.style(),
+    parts.clean(PATHS.dist)
 );
 
 var config;
 
 switch (TARGET) {
+    case 'start':
     case 'build':
     case 'stats':
         config = merge(
             common,
             {
                 mode: 'production',
-                // devtool: 'source-map',
-                entry: {
-                    style: PATHS.style
-                },
+                devtool: 'source-map',
+                // entry: {
+                //     style: PATHS.style
+                // },
                 output: {
                     path: PATHS.dist,
                     filename: '[name].[chunkhash].js',
                     chunkFilename: '[chunkhash].js'
                 }
-            },
-            parts.clean(PATHS.dist),
-            parts.extractBundle({
-                name: 'vendor',
-                entries: ['react', 'react-dom']
-            }),
-            parts.minify()
-            // parts.style(PATHS.style)
+            }
+            // parts.clean(PATHS.dist),
         );
         break;
     // case 'test':
@@ -86,18 +96,49 @@ switch (TARGET) {
                 mode: 'development',
                 devtool: 'eval-source-map'
                 // entry: {
-                //     style: PATHS.style
+                //     // style: PATHS.style
                 // }
             },
-            parts.style(PATHS.style),
+            // parts.style(PATHS.style),
             parts.server({
                 // Customize host/port here if needed
                 host: process.env.HOST,
                 port: process.env.PORT,
                 poll: ENABLE_POLLING
             }),
-            parts.performance(),
+            // parts.performance()
         );
 }
 
 module.exports = config;
+
+// module.exports = common;
+// merge(
+//     {
+//         entry: './app/index.tsx',
+//         output: {
+//             filename: 'bundle.js'
+//         },
+//         resolve: {
+//             // Add '.ts' and '.tsx' as a resolvable extension.
+//             extensions: ['.ts', '.tsx', '.js']
+//         },
+//         module: {
+//             rules: [
+//                 {
+//                     test: /\.ts|\.tsx$/,
+//                     loader: 'awesome-typescript-loader'
+//                 },
+//                 {
+//                     enforce: 'pre',
+//                     test: /\.js$/,
+//                     loader: 'source-map-loader'
+//                 }
+//             ]
+//         }
+//     },
+//     parts.template({
+//         title: 'React App',
+//         appMountId: 'app'
+//     })
+// );
